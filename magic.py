@@ -14,9 +14,7 @@ num_columns = ['fLength', 'fWidth', 'fSize', 'fConc', 'fConc1',
 cat_columns = ['class']
 data.columns = num_columns + cat_columns
 
-
 data = data.drop_duplicates()
-
 
 data_num =  data.select_dtypes(include = [np.number])
 data_cat = data.select_dtypes(include = object)
@@ -35,10 +33,14 @@ train_data, valid_data, train_target, valid_target = train_test_split(
 under_sample = RandomUnderSampler(random_state=42)
 train_data_balanced, target_data_balanced = under_sample.fit_resample(train_data, train_target)
 
-### 
 target_data_balanced = target_data_balanced.values.ravel()
 
-knn = KNeighborsClassifier(n_neighbors=3)
+param_grid = {'n_neighbors': range(1, 25)}
+grid_search = GridSearchCV(KNeighborsClassifier(), param_grid, scoring="f1_weighted", cv=5)
+grid_search.fit(train_data_balanced, target_data_balanced)
+best_k = grid_search.best_params_['n_neighbors']
+
+knn = KNeighborsClassifier(n_neighbors = best_k)
 knn.fit(train_data_balanced, target_data_balanced)
 train_pred = knn.predict(train_data_balanced)
 
@@ -49,11 +51,10 @@ recall = recall_score(target_data_balanced, train_pred)
 f1 = f1_score(target_data_balanced, train_pred)
 clf_report = classification_report(target_data_balanced, train_pred)
 
-
-param_grid = {'n_neighbors': range(1, 25)}
-grid_search = GridSearchCV(KNeighborsClassifier(), param_grid, scoring="f1_weighted", cv=5)
-grid_search.fit(valid_data, valid_target.values.ravel())
-best_k = grid_search.best_params_['n_neighbors']
+# =============================================================================
+# grid_search.fit(valid_data, valid_target.values.ravel())
+# best_k = grid_search.best_params_['n_neighbors']
+# =============================================================================
 
 final_knn = KNeighborsClassifier(n_neighbors=best_k)
 final_knn.fit(train_data_balanced, target_data_balanced)
