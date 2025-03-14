@@ -10,7 +10,7 @@ from sklearn.metrics import classification_report, accuracy_score, precision_sco
 data = pd.read_csv("magic04.data", header=None)
 
 num_columns = ['fLength', 'fWidth', 'fSize', 'fConc', 'fConc1',
-               'fAsym', 'fM3Long', 'fM3Trans', 'fAlpha', 'fDist']
+            'fAsym', 'fM3Long', 'fM3Trans', 'fAlpha', 'fDist']
 cat_columns = ['class']
 data.columns = num_columns + cat_columns
 
